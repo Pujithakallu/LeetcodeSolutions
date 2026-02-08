@@ -1,0 +1,124 @@
+#!/usr/bin/env python3
+"""
+auth_leetcode.py
+================
+Uses Playwright to login to LeetCode and save session cookies to auth.json.
+Handles Cloudflare CAPTCHA by launching a visible browser and waiting.
+
+Usage:
+    python3 scripts/auth_leetcode.py
+"""
+
+import json
+import sys
+import time
+from pathlib import Path
+
+sys.stdout.reconfigure(line_buffering=True)
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+AUTH_FILE = SCRIPT_DIR / "auth.json"
+
+USERNAME = "XXXXXX@gmail.com"
+PASSWORD = "XXXXX"
+
+
+def main():
+    from playwright.sync_api import sync_playwright
+
+    print("Launching browser for LeetCode login...")
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)  # Visible for CAPTCHA
+        context = browser.new_context(
+            user_agent=(
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
+            )
+        )
+        page = context.new_page()
+
+        # Navigate to login page
+        print("Navigating to LeetCode login page...")
+        page.goto("https://leetcode.com/accounts/login/", wait_until="domcontentloaded", timeout=60000)
+        time.sleep(5)
+
+        # Fill in credentials - try multiple selectors
+        print("Filling credentials...")
+        filled = False
+        for attempt in range(5):
+            try:
+                page.wait_for_selector('input[name="login"], input[id="id_login"], input[type="email"], input[autocomplete="username"]', timeout=10000)
+                inputs = page.query_selector_all('input')
+                for inp in inputs:
+                    itype = inp.get_attribute("type") or ""
+                    iname = inp.get_attribute("name") or ""
+                    if iname == "login" or itype == "email" or "user" in iname.lower():
+                        inp.fill(USERNAME)
+                        print(f"  Filled username field ({iname or itype})")
+                        filled = True
+                    elif iname == "password" or itype == "password":
+                        inp.fill(PASSWORD)
+                        print(f"  Filled password field")
+                if filled:
+                    break
+            except Exception as e:
+                print(f"  Attempt {attempt+1}: waiting for form... ({e.__class__.__name__})")
+                time.sleep(3)
+
+        if not filled:
+            print("Could not auto-fill. Please enter credentials manually in the browser.")
+
+        # Try to click Sign In
+        time.sleep(2)
+        for selector in ['button[type="submit"]', 'button:has-text("Sign In")', '#signin_btn']:
+            try:
+                page.click(selector, timeout=3000)
+                print(f"Clicked sign-in button ({selector})")
+                break
+            except Exception:
+                pass
+
+        # Wait for successful login (redirect away from login page)
+        print("Waiting for login to complete (up to 120s)...")
+        print("  >> If CAPTCHA is shown, please solve it in the browser window <<")
+        for i in range(120):
+            url = page.url
+            if "/accounts/login" not in url:
+                print(f"Login successful! Redirected to: {url}")
+                break
+            time.sleep(1)
+            if i % 15 == 14:
+                print(f"  Still on login page... ({i+1}s) - please complete CAPTCHA if shown")
+        else:
+            print("WARNING: Login may not have completed. Saving cookies anyway.")
+
+        # Get cookies
+        cookies = context.cookies()
+        print(f"Got {len(cookies)} cookies")
+
+        # Save cookies
+        cookie_data = {}
+        for cookie in cookies:
+            cookie_data[cookie["name"]] = cookie["value"]
+            if cookie["name"] in ("LEETCODE_SESSION", "csrftoken"):
+                print(f"  {cookie['name']}: {cookie['value'][:20]}...")
+
+        with open(AUTH_FILE, "w") as f:
+            json.dump({"cookies": cookie_data, "raw_cookies": cookies}, f, indent=2)
+
+        has_session = "LEETCODE_SESSION" in cookie_data
+        print(f"\nLEETCODE_SESSION present: {has_session}")
+        print(f"Saved to {AUTH_FILE}")
+
+        browser.close()
+
+    if has_session:
+        print("\nAuthentication successful! You can now run fetch_problems.py")
+    else:
+        print("\nWARNING: No LEETCODE_SESSION cookie found. Premium content may not work.")
+
+
+if __name__ == "__main__":
+    main()

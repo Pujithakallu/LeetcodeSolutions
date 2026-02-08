@@ -1,0 +1,211 @@
+# Problem 1061: Lexicographically Smallest Equivalent String
+
+**Difficulty:** Medium  
+**Tags:** String, Union-Find  
+**Pattern:** Union-Find / Disjoint Set  
+**Link:** [leetcode.com/problems/lexicographically-smallest-equivalent-string](https://leetcode.com/problems/lexicographically-smallest-equivalent-string/)
+
+## Description
+
+You are given two strings of the same length `s1` and `s2` and a string `baseStr`.
+
+We say `s1[i]` and `s2[i]` are equivalent characters.
+
+	- For example, if `s1 = "abc"` and `s2 = "cde"`, then we have `'a' == 'c'`, `'b' == 'd'`, and `'c' == 'e'`.
+
+Equivalent characters follow the usual rules of any equivalence relation:
+
+	- **Reflexivity:** `'a' == 'a'`.
+	- **Symmetry:** `'a' == 'b'` implies `'b' == 'a'`.
+	- **Transitivity:** `'a' == 'b'` and `'b' == 'c'` implies `'a' == 'c'`.
+
+For example, given the equivalency information from `s1 = "abc"` and `s2 = "cde"`, `"acd"` and `"aab"` are equivalent strings of `baseStr = "eed"`, and `"aab"` is the lexicographically smallest equivalent string of `baseStr`.
+
+Return *the lexicographically smallest equivalent string of *`baseStr`* by using the equivalency information from *`s1`* and *`s2`.
+
+ 
+
+Example 1:
+
+```
+
+**Input:** s1 = "parker", s2 = "morris", baseStr = "parser"
+**Output:** "makkek"
+**Explanation:** Based on the equivalency information in s1 and s2, we can group their characters as [m,p], [a,o], [k,r,s], [e,i].
+The characters in each group are equivalent and sorted in lexicographical order.
+So the answer is "makkek".
+
+```
+
+Example 2:
+
+```
+
+**Input:** s1 = "hello", s2 = "world", baseStr = "hold"
+**Output:** "hdld"
+**Explanation: **Based on the equivalency information in s1 and s2, we can group their characters as [h,w], [d,e,o], [l,r].
+So only the second letter 'o' in baseStr is changed to 'd', the answer is "hdld".
+
+```
+
+Example 3:
+
+```
+
+**Input:** s1 = "leetcode", s2 = "programs", baseStr = "sourcecode"
+**Output:** "aauaaaaada"
+**Explanation:** We group the equivalent characters in s1 and s2 as [a,o,e,r,s,c], [l,p], [g,t] and [d,m], thus all letters in baseStr except 'u' and 'd' are transformed to 'a', the answer is "aauaaaaada".
+
+```
+
+ 
+
+**Constraints:**
+
+	- `1 <= s1.length, s2.length, baseStr <= 1000`
+	- `s1.length == s2.length`
+	- `s1`, `s2`, and `baseStr` consist of lowercase English letters.
+
+## Approach: Union-Find / Disjoint Set
+
+Use Union-Find with path compression and union by rank to efficiently manage connected components. Find(x) returns the root of x's component; Union(x,y) merges two components.
+
+## Pseudocode
+
+```
+1. parent[i] = i for all nodes (each is its own set)
+2. find(x): follow parent pointers to root (with path compression)
+3. union(x, y): merge sets of x and y by rank
+4. Process edges/operations:
+   a. For each edge (u, v): union(u, v)
+5. Answer queries using find()
+```
+
+## Algorithm Flow
+
+```mermaid
+flowchart TD
+    A["parent[i] = i for all nodes"] --> B[For each edge or query]
+    B --> C{"Operation type?"}
+    C -- Union --> D["find root of u and v"]
+    D --> E{Same root?}
+    E -- Yes --> F[Already connected / cycle]
+    E -- No --> G[Merge smaller tree under larger]
+    C -- Find --> H[Follow parent to root]
+    H --> I[Path compression: flatten tree]
+    G --> B
+    F --> B
+    I --> J[Return root]
+```
+
+## Visual State Transitions
+
+**Union-Find Step-by-Step:**
+
+**Frame 1: Initial - each node is own parent**
+```mermaid
+graph TD
+    N1((1)) --- P1["parent=1"]
+    N2((2)) --- P2["parent=2"]
+    N3((3)) --- P3["parent=3"]
+    N4((4)) --- P4["parent=4"]
+```
+
+**Frame 2: Union(1,2) - merge components**
+```mermaid
+graph TD
+    N1((1))
+    N2((2)) -->|parent| N1
+    N3((3))
+    N4((4))
+    E["find(1)=1, find(2)=2 -> merge"]
+```
+
+**Frame 3: Union(3,4) then Union(2,3)**
+```mermaid
+graph TD
+    N1((1))
+    N2((2)) -->|parent| N1
+    N3((3)) -->|parent| N1
+    N4((4)) -->|parent| N3
+    E["All nodes in one component"]
+```
+
+**Frame 4: Path compression on find(4)**
+```mermaid
+graph TD
+    N1((1))
+    N2((2)) -->|parent| N1
+    N3((3)) -->|parent| N1
+    N4((4)) -->|parent| N1
+    E["After find(4): path compressed to root"]
+```
+
+
+## Complexity Analysis
+
+- **Time:** O(n * alpha(n))
+- **Space:** O(n)
+
+## Solution (Python3)
+
+```python
+class Solution:
+    def smallestEquivalentString(self, s1: str, s2: str, baseStr: str) -> str:
+        # Union Find (Disjoint Set Union) - O(n * alpha(n))
+        parent = list(range(len(s1) + 1 if isinstance(s1, list) else s1 + 1))
+        rank = [0] * len(parent)
+        
+        def find(x):
+            if parent[x] != x:
+                parent[x] = find(parent[x])
+            return parent[x]
+        
+        def union(x, y):
+            px, py = find(x), find(y)
+            if px == py:
+                return False
+            if rank[px] < rank[py]:
+                px, py = py, px
+            parent[py] = px
+            if rank[px] == rank[py]:
+                rank[px] += 1
+            return True
+        
+        components = len(parent)
+        # Process edges/connections
+        return components
+```
+
+## Solution (C++)
+
+```cpp
+#include <functional>
+#include <numeric>
+#include <string>
+#include <vector>
+using namespace std;
+
+class Solution {
+public:
+    string smallestEquivalentString(string& s1, string& s2, string& baseStr) {
+        // Union Find (DSU) - O(n * alpha(n))
+        int n = s1.size();
+        vector<int> parent(n + 1), rnk(n + 1, 0);
+        iota(parent.begin(), parent.end(), 0);
+        function<int(int)> find = [&](int x) -> int {
+            return parent[x] == x ? x : parent[x] = find(parent[x]);
+        };
+        auto unite = [&](int x, int y) -> bool {
+            int px = find(x), py = find(y);
+            if (px == py) return false;
+            if (rnk[px] < rnk[py]) swap(px, py);
+            parent[py] = px;
+            if (rnk[px] == rnk[py]) rnk[px]++;
+            return true;
+        };
+        int components = n;
+        return components;
+    }
+};
+```

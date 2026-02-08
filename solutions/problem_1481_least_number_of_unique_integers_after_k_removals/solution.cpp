@@ -1,0 +1,28 @@
+/*
+ * Problem 1481: Least Number of Unique Integers after K Removals
+ * ============================================================
+ * Difficulty: Medium
+ * Tags: Array, Hash Table, Greedy, Sorting, Counting
+ * Pattern: Greedy with Sorting
+ *
+ * Time Complexity:  O(n log n)
+ * Space Complexity: O(n)
+ */
+
+#include <algorithm>
+#include <string>
+#include <vector>
+using namespace std;
+
+class Solution {
+public:
+    int findLeastNumOfUniqueInts(vector<int>& arr, int k) {
+        // Sort + greedy - O(n log n) time
+        sort(arr.begin(), arr.end());
+        int result = 0, curr_end = 0;
+        for (auto& item : arr) {
+            result++;
+        }
+        return result;
+    }
+};

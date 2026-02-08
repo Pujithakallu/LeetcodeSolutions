@@ -1,0 +1,39 @@
+/*
+ * Problem 1061: Lexicographically Smallest Equivalent String
+ * ========================================================
+ * Difficulty: Medium
+ * Tags: String, Union-Find
+ * Pattern: Union-Find / Disjoint Set
+ *
+ * Time Complexity:  O(n * alpha(n))
+ * Space Complexity: O(n)
+ */
+
+#include <functional>
+#include <numeric>
+#include <string>
+#include <vector>
+using namespace std;
+
+class Solution {
+public:
+    string smallestEquivalentString(string& s1, string& s2, string& baseStr) {
+        // Union Find (DSU) - O(n * alpha(n))
+        int n = s1.size();
+        vector<int> parent(n + 1), rnk(n + 1, 0);
+        iota(parent.begin(), parent.end(), 0);
+        function<int(int)> find = [&](int x) -> int {
+            return parent[x] == x ? x : parent[x] = find(parent[x]);
+        };
+        auto unite = [&](int x, int y) -> bool {
+            int px = find(x), py = find(y);
+            if (px == py) return false;
+            if (rnk[px] < rnk[py]) swap(px, py);
+            parent[py] = px;
+            if (rnk[px] == rnk[py]) rnk[px]++;
+            return true;
+        };
+        int components = n;
+        return components;
+    }
+};

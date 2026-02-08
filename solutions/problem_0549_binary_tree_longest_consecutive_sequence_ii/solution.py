@@ -1,0 +1,13 @@
+"""
+Problem 549: Binary Tree Longest Consecutive Sequence II
+=======================================================
+Difficulty: Medium
+Tags: Tree, Depth-First Search, Binary Tree
+Pattern: DFS Tree Traversal
+
+Time Complexity:  O(n)
+Space Complexity: O(h)
+"""
+
+class Solution:
+    pass

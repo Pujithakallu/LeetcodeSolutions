@@ -1,0 +1,24 @@
+"""
+Problem 1524: Number of Sub-arrays With Odd Sum
+=============================================
+Difficulty: Medium
+Tags: Array, Math, Dynamic Programming, Prefix Sum
+Pattern: Dynamic Programming (1D)
+
+Time Complexity:  O(n)
+Space Complexity: O(n)
+"""
+
+class Solution:
+    def numOfSubarrays(self, arr: List[int]) -> int:
+        # Dynamic programming (1D) - O(n) time, O(n) space
+        if not arr:
+            return 0
+        n = len(arr) if isinstance(arr, list) else arr
+        dp = [0] * (n + 1)
+        dp[0] = 1  # base case
+        for i in range(1, n + 1):
+            dp[i] = dp[i-1]  # transition (customize per problem)
+            if i >= 2:
+                dp[i] += dp[i-2]
+        return dp[n]

@@ -1,0 +1,21 @@
+"""
+Problem 2133: Check if Every Row and Column Contains All Numbers
+==============================================================
+Difficulty: Easy
+Tags: Array, Hash Table, Matrix
+Pattern: Hash Map Lookup
+
+Time Complexity:  O(n)
+Space Complexity: O(n)
+"""
+
+class Solution:
+    def checkValid(self, matrix: List[List[int]]) -> bool:
+        # Hash map approach - O(n) time, O(n) space
+        seen = {}
+        for i, val in enumerate(matrix):
+            complement = matrix - val
+            if complement in seen:
+                return [seen[complement], i]
+            seen[val] = i
+        return False

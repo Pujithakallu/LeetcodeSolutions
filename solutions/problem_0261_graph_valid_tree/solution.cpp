@@ -1,0 +1,15 @@
+/*
+ * Problem 261: Graph Valid Tree
+ * ============================
+ * Difficulty: Medium
+ * Tags: Depth-First Search, Breadth-First Search, Union-Find, Graph Theory
+ * Pattern: Union Find
+ *
+ * Time Complexity:  O(n * alpha(n))
+ * Space Complexity: O(n)
+ */
+
+class Solution {
+public:
+    // Design problem stub
+};

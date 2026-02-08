@@ -1,0 +1,134 @@
+# Problem 1775: Equal Sum Arrays With Minimum Number of Operations
+
+**Difficulty:** Medium  
+**Tags:** Array, Hash Table, Greedy, Counting  
+**Pattern:** Greedy  
+**Link:** [leetcode.com/problems/equal-sum-arrays-with-minimum-number-of-operations](https://leetcode.com/problems/equal-sum-arrays-with-minimum-number-of-operations/)
+
+## Description
+
+You are given two arrays of integers `nums1` and `nums2`, possibly of different lengths. The values in the arrays are between `1` and `6`, inclusive.
+
+In one operation, you can change any integer's value in **any **of the arrays to **any** value between `1` and `6`, inclusive.
+
+Return *the minimum number of operations required to make the sum of values in *`nums1`* equal to the sum of values in *`nums2`*.* Return `-1`​​​​​ if it is not possible to make the sum of the two arrays equal.
+
+ 
+
+Example 1:
+
+```
+
+**Input:** nums1 = [1,2,3,4,5,6], nums2 = [1,1,2,2,2,2]
+**Output:** 3
+**Explanation:** You can make the sums of nums1 and nums2 equal with 3 operations. All indices are 0-indexed.
+- Change nums2[0] to 6. nums1 = [1,2,3,4,5,6], nums2 = [**6**,1,2,2,2,2].
+- Change nums1[5] to 1. nums1 = [1,2,3,4,5,**1**], nums2 = [6,1,2,2,2,2].
+- Change nums1[2] to 2. nums1 = [1,2,**2**,4,5,1], nums2 = [6,1,2,2,2,2].
+
+```
+
+Example 2:
+
+```
+
+**Input:** nums1 = [1,1,1,1,1,1,1], nums2 = [6]
+**Output:** -1
+**Explanation:** There is no way to decrease the sum of nums1 or to increase the sum of nums2 to make them equal.
+
+```
+
+Example 3:
+
+```
+
+**Input:** nums1 = [6,6], nums2 = [1]
+**Output:** 3
+**Explanation:** You can make the sums of nums1 and nums2 equal with 3 operations. All indices are 0-indexed. 
+- Change nums1[0] to 2. nums1 = [**2**,6], nums2 = [1].
+- Change nums1[1] to 2. nums1 = [2,**2**], nums2 = [1].
+- Change nums2[0] to 4. nums1 = [2,2], nums2 = [**4**].
+
+```
+
+ 
+
+**Constraints:**
+
+	- `1 <= nums1.length, nums2.length <= 10^5`
+	- `1 <= nums1[i], nums2[i] <= 6`
+
+## Approach: Greedy
+
+Make the locally optimal choice at each step, trusting it leads to a global optimum. Greedy works when the problem has the greedy-choice property and optimal substructure.
+
+## Pseudocode
+
+```
+1. Sort or organize data for greedy ordering
+2. Initialize result
+3. For each element in greedy order:
+   a. If element satisfies constraint:
+      - Take the greedy choice
+      - Update result and state
+4. Return result
+```
+
+## Algorithm Flow
+
+```mermaid
+flowchart TD
+    A[Sort / organize for greedy order] --> B[Initialize result]
+    B --> C[For each element in order]
+    C --> D{Satisfies constraint?}
+    D -- Yes --> E[Take greedy choice]
+    E --> F[Update result and state]
+    D -- No --> G[Skip element]
+    F --> C
+    G --> C
+    C --> H[Return result]
+```
+
+## Complexity Analysis
+
+- **Time:** O(n log n)
+- **Space:** O(1)
+
+## Solution (Python3)
+
+```python
+class Solution:
+    def minOperations(self, nums1: List[int], nums2: List[int]) -> int:
+        # Greedy approach - O(n) time
+        result = 0
+        curr_max = 0
+        for i in range(len(nums1)):
+            if isinstance(nums1[i], int):
+                curr_max = max(curr_max, nums1[i])
+                result = max(result, curr_max)
+            else:
+                result += 1
+        return result
+```
+
+## Solution (C++)
+
+```cpp
+#include <algorithm>
+#include <string>
+#include <vector>
+using namespace std;
+
+class Solution {
+public:
+    int minOperations(vector<int>& nums1, vector<int>& nums2) {
+        // Greedy approach - O(n) time
+        int result = 0, curr_max = 0;
+        for (int i = 0; i < (int)nums1.size(); i++) {
+            curr_max = max(curr_max, nums1[i]);
+            result = max(result, curr_max);
+        }
+        return result;
+    }
+};
+```

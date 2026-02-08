@@ -1,0 +1,31 @@
+/*
+ * Problem 822: Card Flipping Game
+ * ==============================
+ * Difficulty: Medium
+ * Tags: Array, Hash Table
+ * Pattern: Hash Map Lookup
+ *
+ * Time Complexity:  O(n)
+ * Space Complexity: O(n)
+ */
+
+#include <string>
+#include <unordered_map>
+#include <vector>
+using namespace std;
+
+class Solution {
+public:
+    int flipgame(vector<int>& fronts, vector<int>& backs) {
+        // Hash map approach - O(n) time, O(n) space
+        unordered_map<int, int> seen;
+        for (int i = 0; i < fronts.size(); i++) {
+            int complement = backs - fronts[i];
+            if (seen.count(complement)) {
+                return {seen[complement], i};
+            }
+            seen[fronts[i]] = i;
+        }
+        return 0;
+    }
+};

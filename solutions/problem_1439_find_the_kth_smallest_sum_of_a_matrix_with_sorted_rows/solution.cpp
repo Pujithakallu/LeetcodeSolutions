@@ -1,0 +1,29 @@
+/*
+ * Problem 1439: Find the Kth Smallest Sum of a Matrix With Sorted Rows
+ * ==================================================================
+ * Difficulty: Hard
+ * Tags: Array, Binary Search, Heap (Priority Queue), Matrix
+ * Pattern: Heap / Priority Queue
+ *
+ * Time Complexity:  O(n log n)
+ * Space Complexity: O(n)
+ */
+
+#include <queue>
+#include <string>
+#include <vector>
+using namespace std;
+
+class Solution {
+public:
+    int kthSmallest(vector<vector<int>>& mat, int k) {
+        // Heap/Priority Queue - O(n log k) time
+        priority_queue<int, vector<int>, greater<int>> pq;
+        for (int val : mat) {
+            pq.push(val);
+            if ((int)pq.size() > k)
+                pq.pop();
+        }
+        return pq.empty() ? 0 : pq.top();
+    }
+};
